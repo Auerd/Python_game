@@ -17,7 +17,7 @@ def main():
     # Определяем игрока
     hero = Player(55, 55, 0)
     # Инициализация пайгейм
-    left = right = up = False
+    down = left = right = up = False
     run = True
     pygame.init()
     # Экран
@@ -31,9 +31,9 @@ def main():
     bg = pygame.image.load('bg/maxresdefault.jpg')
     bg = pygame.transform.scale(bg, (int(bg.get_width()/1.1), int(bg.get_height()/1.1)))
     real_count_win = 1
-    frame_now = 0
-    max_frames = 6
+    frames = 0
     new_time = time.time()
+    FPS = 120
     while run:
         timer = pygame.time.Clock()
         timer.tick(120)
@@ -52,6 +52,10 @@ def main():
                 up = True
             elif i.type == pygame.KEYUP and i.key == pygame.K_SPACE:
                 up = False
+            if i.type == pygame.KEYDOWN and i.key & pygame.key.get_mods():
+                down = True
+            elif i.type == pygame.KEYUP and i.key & pygame.key.get_mods():
+                down = False
         # Создаём группу сущностей и список объектов и создаём в ней героя
         entities = pygame.sprite.Group()
         platforms = []
@@ -76,16 +80,13 @@ def main():
                 entities.add(sb)
                 platforms.append(sb)
 
-        # ненавижу анимации!!! С этой хернёй провозился целый вечер и ничего не получилось. Ненавижу библиотеки! АААААА!
-        # сделал вот такой простенький счётчик
+        frames += 1
         real_time = time.time()
         # частота обновления кадров
-        if real_time - new_time > 0.1:
+        if real_time - new_time > 1:
             new_time = time.time()
-            frame_now += 1
-        # чтобы не выходил за границы массива
-        if frame_now == max_frames:
-            frame_now = 0
+            FPS = frames
+            frames = 0
 
         # Параллакс
         screen.blit(bg, ((camera.state.x - bg.get_width()/2)/2, 0))
@@ -93,7 +94,7 @@ def main():
         for entity in entities:
             screen.blit(entity.image, camera.apply(entity))
         # обновление показаний главного героя
-        hero.update(left, right, up, platforms)
+        hero.update(left, right, up, down, platforms, FPS)
         # прорисовка главного героя
         camera.update(hero)
         # обновление экрана
