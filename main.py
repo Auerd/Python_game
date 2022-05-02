@@ -9,7 +9,6 @@ import time
 win_width = c.win_width  # Ширина
 win_height = c.win_height  # Высота
 display = (win_width, win_height)  # Дисплей
-prop = 1.4
 
 background_color = '#004400'
 
@@ -29,6 +28,7 @@ def main():
     # Камера
     camera = c.Camera(c.camera_configure, total_level_width, total_level_height)
     # Карты
+    prop = 1.4
     bg = pygame.image.load('bg/hCUwLQ.png')
     bg = pygame.transform.scale(bg, (int(bg.get_width()*prop), int(bg.get_height()*prop)))
     count_win = 0

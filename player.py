@@ -103,10 +103,6 @@ class Player(sprite.Sprite):
         self.boltAnimShiftRight.play()
 
     def update(self, left, right, up, down, platforms, FPS):
-        move_speed_fps = int(move_speed / FPS)
-        gravity_fps = Gravity/FPS
-        jump_power_fps = Jump_power/FPS
-
         if not self.onGround or self.stuck:
             self.yvel += Gravity
 
