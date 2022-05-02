@@ -1,6 +1,6 @@
 import pygame as p
 
-win_width = 800
+win_width = 1000
 win_height = 640
 
 
