@@ -79,7 +79,7 @@ def main():
         platforms_on_maps.append(platforms)
     while run:
         timer = pygame.time.Clock()
-        timer.tick(60)
+        timer.tick(64)
         for i in pygame.event.get():
             if i.type == pygame.QUIT:
                 run = False

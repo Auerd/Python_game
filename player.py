@@ -183,15 +183,15 @@ class Player(sprite.Sprite):
                 self.rect.x >= total_level_width:
             self.die()
 
-        if down and self.onGround:
+        if down:
             if not self.did:
                 self.rect.height = shift_height
-                # self.rect.y += height - shift_height
+                self.rect.y += height - shift_height
             self.did = True
         elif not down:
             if self.did:
                 self.rect.height = height
-                # self.rect.y += height - shift_height
+                self.rect.y += height - shift_height
             self.did = False
 
         if not(up or down) and self.right_stop:
@@ -206,6 +206,12 @@ class Player(sprite.Sprite):
         elif down and self.left_stop:
             self.image.fill(Color(color))
             self.boltAnimShiftLeft.blit(self.image, (0, 0))
+        elif down and not(self.left_stop or self.right_stop):
+            self.image.fill(Color(color))
+            self.boltAnimShiftRight.blit(self.image, (0, 0))
+        elif not (down or up) and not(self.left_stop or self.right_stop) and self.xvel == 0:
+            self.image.fill(Color(color))
+            self.boltAnimStay.blit(self.image, (0, 0))
 
         self.onGround = False
         self.stuck = False
