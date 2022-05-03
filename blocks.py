@@ -19,22 +19,44 @@ ANIMATION_WATERFALL = [pygame.transform.scale(pygame.image.load(f'bg/frame-{i} â
 class Platform(Sprite):
     def __init__(self, x, y):
         Sprite.__init__(self)
-        self.image = pygame.image.load("blocks/2png-transbrick-mario.png")
+        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0002.png"),
+                                            (platform_width, platform_height))
         self.rect = Rect(x, y, platform_width, platform_height)
+
+
+class PlatformLeft(Platform):
+    def __init__(self, x, y):
+        Platform.__init__(self, x, y)
+        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0001.png"),
+                                            (platform_width, platform_height))
+
+
+class PlatformRight(Platform):
+    def __init__(self, x, y):
+        Platform.__init__(self, x, y)
+        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0003.png"),
+                                            (platform_width, platform_height))
+
+
+class PlatformMiddle(Platform):
+    def __init__(self, x, y):
+        Platform.__init__(self, x, y)
+        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0000.png"),
+                                            (platform_width, platform_height))
 
 
 class BlockDie(Platform):
     def __init__(self, x, y):
         Platform.__init__(self, x, y)
-        self.image = pygame.image.load("blocks/Untitled-1.png")
-        self.image.set_colorkey('#000000')
+        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0068.png"),
+                                            (platform_width, platform_height))
 
 
 class Steelblock(Platform):
     def __init__(self, x, y):
         Platform.__init__(self, x, y)
-        self.image = pygame.image.load("blocks/Steelblock.png")
-        self.image.set_colorkey('#FFFFFF')
+        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0029.png"),
+                                            (platform_width, platform_height))
 
 
 class BlockWin(Platform):
@@ -47,12 +69,6 @@ class BlockWin(Platform):
 class BlockWaterFall(Sprite):
     def __init__(self, x, y, frame):
         Platform.__init__(self, x, y)
-        # boltanim = []
-        # for anim in ANIMATION_WATERFALL:
-        #     boltanim.append((anim, animation_delay))
-        # self.boltAnim_fall = pyganim.PygAnimation(boltanim)
-        # self.boltAnim_fall.play()
         self.rect = Rect(x-platform_width, y-platform_height, platform_width*3, platform_height*3)
-        # self.image = Surface((platform_width*3, platform_height*2))
         self.image = ANIMATION_WATERFALL[frame]
         self.image.set_colorkey('#FAFAFA')

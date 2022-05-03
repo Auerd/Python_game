@@ -13,7 +13,7 @@ sprite = pygame.sprite
 Color = pygame.Color
 Rect = pygame.Rect
 timer = pygame.time.Clock()
-Jump_power = 6
+Jump_power = 5.5
 Gravity = 0.35
 move_speed = 5
 width = int(22 * Bigger)
@@ -61,6 +61,8 @@ class Player(sprite.Sprite):
         self.stuck = None
         self.winner = winner
         self.did = False
+        self.right_stop = 0
+        self.left_stop = 0
 
         # Анимация движения вправо
         boltanim = []
@@ -111,12 +113,18 @@ class Player(sprite.Sprite):
                 self.yvel = -Jump_power
                 self.image.fill(Color(color))
                 self.boltAnimJump.blit(self.image, (0, 0))
+                self.right_stop = self.left_stop = False
+
+        if self.xvel != 0:
+            self.right_stop = self.left_stop = False
 
         if left and (self.onGround or self.xvel == 0 or self.stuck):
             if not down and self.xvel > -move_speed:
                 self.xvel -= move_speed / 4
             elif self.xvel > -move_speed_shift:
                 self.xvel -= move_speed_shift / 4
+            elif self.xvel < move_speed_shift:
+                self.xvel += move_speed_shift / 4
 
         if self.xvel < 0:
             self.image.fill(Color(color))
@@ -138,6 +146,8 @@ class Player(sprite.Sprite):
                 self.xvel += move_speed / 4
             elif self.xvel < move_speed_shift:
                 self.xvel += move_speed_shift / 4
+            elif self.xvel > move_speed_shift:
+                self.xvel -= move_speed_shift / 4
 
         if self.xvel > 0:
             self.image.fill(Color(color))
@@ -154,42 +164,48 @@ class Player(sprite.Sprite):
                 else:
                     self.boltAnimStay.blit(self.image, (0, 0))
 
-        if not (left or right):
-            if self.onGround:
-                if self.xvel < 0:
-                    self.xvel += move_speed / 4
-                    if -move_speed / 4 < self.xvel < move_speed / 4:
-                        self.xvel = 0
-                        if not(up and down):
-                            self.image.fill(Color(color))
-                            self.boltAnimStayLeft.blit(self.image, (0, 0))
-                        elif down:
-                            self.image.fill(Color(color))
-                            self.boltAnimShiftRight.blit(self.image, (0, 0))
-                if self.xvel > 0:
-                    self.xvel -= move_speed / 4
-                    if -move_speed / 4 < self.xvel < move_speed / 4:
-                        self.xvel = 0
-                        if not(up and down):
-                            self.image.fill(Color(color))
-                            self.boltAnimStayRight.blit(self.image, (0, 0))
-                        elif down:
-                            self.image.fill(Color(color))
-                            self.boltAnimShiftLeft.blit(self.image, (0, 0))
+        if not (left or right) and self.onGround:
+            if self.xvel < 0:
+                self.xvel += move_speed / 4
+                if -move_speed / 4 < self.xvel < move_speed / 4:
+                    self.xvel = 0
+                    self.left_stop = True
 
-        if -self.rect.height * 1.1 >= self.rect.y or self.rect.y >= total_level_height or self.rect.x <= 0 or self.rect.x >= total_level_width:
+            if self.xvel > 0:
+                self.xvel -= move_speed / 4
+                if -move_speed / 4 < self.xvel < move_speed / 4:
+                    self.xvel = 0
+                    self.right_stop = True
+
+        if -self.rect.height * 1.1 >= self.rect.y or \
+                self.rect.y >= total_level_height or \
+                self.rect.x <= self.rect.width or \
+                self.rect.x >= total_level_width:
             self.die()
 
-        if down:
+        if down and self.onGround:
             if not self.did:
                 self.rect.height = shift_height
-                self.rect.y += height - shift_height
+                # self.rect.y += height - shift_height
             self.did = True
         elif not down:
             if self.did:
-                self.rect.y += height - shift_height
                 self.rect.height = height
+                # self.rect.y += height - shift_height
             self.did = False
+
+        if not(up or down) and self.right_stop:
+            self.image.fill(Color(color))
+            self.boltAnimStayRight.blit(self.image, (0, 0))
+        elif down and self.right_stop:
+            self.image.fill(Color(color))
+            self.boltAnimShiftRight.blit(self.image, (0, 0))
+        if not(up or down) and self.left_stop:
+            self.image.fill(Color(color))
+            self.boltAnimStayLeft.blit(self.image, (0, 0))
+        elif down and self.left_stop:
+            self.image.fill(Color(color))
+            self.boltAnimShiftLeft.blit(self.image, (0, 0))
 
         self.onGround = False
         self.stuck = False
