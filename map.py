@@ -1,4 +1,5 @@
 from levels import levels
+import random
 
 platform_width = 32
 platform_height = 32
@@ -30,7 +31,10 @@ def new_world_map(level__):
                 world_map_new.append([i * platform_width, j * platform_height, 'platform_r'])
             elif char == "=":
                 world_map_new.append([i * platform_width, j * platform_height, 'platform_m'])
-
+            elif char == "W":
+                world_map_new.append([i * platform_width, j * platform_height, char])
+            elif char == "C":
+                world_map_new.append([i * platform_width, j * platform_height, char])
     return world_map_new
 
 
