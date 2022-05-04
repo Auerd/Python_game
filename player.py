@@ -2,12 +2,13 @@ import pyganim
 import pygame
 import time
 import blocks
-from map import total_level_width, total_level_height
+from map import total_level_width, total_level_height, platform_height, platform_width
 import monster
+import math
 
 # Всё всё всё можно изменять в эксперементальных целях
 Coefficient = 60
-Bigger = 1.2
+Bigger = 1.3
 Surface = pygame.Surface
 sprite = pygame.sprite
 Color = pygame.Color
@@ -18,7 +19,7 @@ Gravity = 0.35
 move_speed = 5
 width = int(22 * Bigger)
 height = int(32 * Bigger)
-shift_height = int((32 * Bigger) / 1.3)
+shift_height = int((32 * Bigger) / 1.35)
 color = '#666666'
 move_speed_shift = move_speed/4
 animation_delay = 50
@@ -45,6 +46,18 @@ animation_shift_right = [(pygame.transform.scale(pygame.image.load('player2/p1_d
 animation_shift_left = [(pygame.transform.flip(animation_shift_right[0][0], True, False), 0.1)]
 
 
+def distance_is(distance_min, obj_1, obj_2):
+    obj_1_x = obj_1.rect.x - obj_1.rect.width/2
+    obj_1_y = obj_1.rect.y - obj_1.rect.height/2
+    obj_2_x = obj_2.rect.x - obj_2.rect.width/2
+    obj_2_y = obj_2.rect.y - obj_2.rect.height/2
+    distance = math.sqrt((obj_1_x-obj_2_x)*(obj_1_x-obj_2_x) + (obj_1_y-obj_2_y)*(obj_1_y-obj_2_y))
+    if distance <= distance_min:
+        return True
+    else:
+        return False
+
+
 # Сам игрок
 class Player(sprite.Sprite):
     def __init__(self, x, y, winner):
@@ -63,6 +76,7 @@ class Player(sprite.Sprite):
         self.did = False
         self.right_stop = 0
         self.left_stop = 0
+        self.coin = False
 
         # Анимация движения вправо
         boltanim = []
@@ -183,15 +197,15 @@ class Player(sprite.Sprite):
                 self.rect.x >= total_level_width:
             self.die()
 
-        if down and self.onGround:
+        if down:
             if not self.did:
                 self.rect.height = shift_height
-                # self.rect.y += height - shift_height
+                self.rect.y += height - shift_height
             self.did = True
         elif not down:
             if self.did:
                 self.rect.height = height
-                # self.rect.y += height - shift_height
+                self.rect.y += height - shift_height
             self.did = False
 
         if not(up or down) and self.right_stop:
@@ -206,6 +220,12 @@ class Player(sprite.Sprite):
         elif down and self.left_stop:
             self.image.fill(Color(color))
             self.boltAnimShiftLeft.blit(self.image, (0, 0))
+        elif down and not(self.left_stop or self.right_stop) and self.xvel == 0:
+            self.image.fill(Color(color))
+            self.boltAnimShiftRight.blit(self.image, (0, 0))
+        elif not (down or up) and not(self.left_stop or self.right_stop) and self.xvel == 0:
+            self.image.fill(Color(color))
+            self.boltAnimStay.blit(self.image, (0, 0))
 
         self.onGround = False
         self.stuck = False
@@ -233,7 +253,7 @@ class Player(sprite.Sprite):
                     self.rect.top = platform.rect.bottom
                     self.yvel = 0
                     self.stuck = True
-                if isinstance(platform, (blocks.BlockDie, monster.Monster)):
+                if isinstance(platform, blocks.BlockDie):
                     self.die()
                 elif isinstance(platform, blocks.BlockWin):
                     self.win()

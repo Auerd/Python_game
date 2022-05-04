@@ -26,6 +26,3 @@ class Camera(object):
 
     def update(self, target):
         self.state = self.camera_configure(self.state, target.rect)
-
-
-
