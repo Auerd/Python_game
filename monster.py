@@ -4,8 +4,8 @@
 import pyganim
 import pygame
 from map import platform_width, platform_height
+import random
 
-ANIMATION_DELAY = 300
 COLOR = "#000000"
 COIN_ANIMATION = [pygame.transform.scale(
     pygame.image.load(f"tiles/Tiles/tile_015{i}.png"),
@@ -43,6 +43,7 @@ COIN_ANIMATION = [pygame.transform.scale(
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self, x, y, up):
+        ANIMATION_DELAY = random.randint(275, 325)
         pygame.sprite.Sprite.__init__(self)
         boltanim = []
         self.image = pygame.Surface((platform_width, platform_height))

@@ -51,7 +51,7 @@ class BlockDie(Platform):
         Platform.__init__(self, x, y)
         self.image = pygame.image.load("tiles/Tiles/tile_0068.png")
         self.image = pygame.transform.scale(self.image, (platform_width, platform_height))
-        self.rect = Rect(x, y, platform_width, platform_height)
+        self.rect = Rect(x, y, platform_width, platform_height/2)
 
 
 class Steelblock(Platform):

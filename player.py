@@ -2,8 +2,7 @@ import pyganim
 import pygame
 import time
 import blocks
-from map import total_level_width, total_level_height, platform_height, platform_width
-import monster
+from map import total_level_width, total_level_height
 import math
 
 # Всё всё всё можно изменять в эксперементальных целях
@@ -42,8 +41,6 @@ animation_jump = [(pygame.transform.scale(pygame.image.load('player2/p1_front.pn
 animation_stay = animation_jump
 animation_stay_right = [(pygame.transform.scale(pygame.image.load('player2/p1_stand.png'), (width, height)), 0.1)]
 animation_stay_left = [(pygame.transform.flip(animation_stay_right[0][0], True, False), 0.1)]
-animation_shift_right = [(pygame.transform.scale(pygame.image.load('player2/p1_duck.png'), (width, shift_height)), 0.1)]
-animation_shift_left = [(pygame.transform.flip(animation_shift_right[0][0], True, False), 0.1)]
 
 
 def distance_is(distance_min, obj_1, obj_2):
@@ -77,6 +74,7 @@ class Player(sprite.Sprite):
         self.right_stop = 0
         self.left_stop = 0
         self.coin = False
+        self.must_down = False
 
         # Анимация движения вправо
         boltanim = []
@@ -111,14 +109,8 @@ class Player(sprite.Sprite):
         # Прыгает на месте
         self.boltAnimJump = pyganim.PygAnimation(animation_jump)
         self.boltAnimJump.play()
-        # Приседает влево
-        self.boltAnimShiftLeft = pyganim.PygAnimation(animation_shift_left)
-        self.boltAnimShiftLeft.play()
-        # Приседает вправо
-        self.boltAnimShiftRight = pyganim.PygAnimation(animation_shift_right)
-        self.boltAnimShiftRight.play()
 
-    def update(self, left, right, up, down, platforms, FPS):
+    def update(self, left, right, up, platforms, FPS):
         if not self.onGround or self.stuck:
             self.yvel += Gravity
 
@@ -133,20 +125,14 @@ class Player(sprite.Sprite):
             self.right_stop = self.left_stop = False
 
         if left and (self.onGround or self.xvel == 0 or self.stuck):
-            if not down and self.xvel > -move_speed:
+            if self.xvel > -move_speed:
                 self.xvel -= move_speed / 4
-            elif self.xvel > -move_speed_shift:
-                self.xvel -= move_speed_shift / 4
-            elif self.xvel < move_speed_shift:
-                self.xvel += move_speed_shift / 4
 
         if self.xvel < 0:
             self.image.fill(Color(color))
             if not self.stuck:
                 if up:
                     self.boltAnimJumpLeft.blit(self.image, (0, 0))
-                elif down:
-                    self.boltAnimShiftLeft.blit(self.image, (0, 0))
                 else:
                     self.boltAnimLeft.blit(self.image, (0, 0))
             else:
@@ -156,20 +142,14 @@ class Player(sprite.Sprite):
                     self.boltAnimStay.blit(self.image, (0, 0))
 
         if right and (self.onGround or self.xvel == 0 or self.stuck):
-            if not down and self.xvel < move_speed:
+            if self.xvel < move_speed:
                 self.xvel += move_speed / 4
-            elif self.xvel < move_speed_shift:
-                self.xvel += move_speed_shift / 4
-            elif self.xvel > move_speed_shift:
-                self.xvel -= move_speed_shift / 4
 
         if self.xvel > 0:
             self.image.fill(Color(color))
             if not self.stuck:
                 if up:
                     self.boltAnimJumpRight.blit(self.image, (0, 0))
-                elif down:
-                    self.boltAnimShiftRight.blit(self.image, (0, 0))
                 else:
                     self.boltAnimRight.blit(self.image, (0, 0))
             else:
@@ -197,38 +177,19 @@ class Player(sprite.Sprite):
                 self.rect.x >= total_level_width:
             self.die()
 
-        if down:
-            if not self.did:
-                self.rect.height = shift_height
-                self.rect.y += height - shift_height
-            self.did = True
-        elif not down:
-            if self.did:
-                self.rect.height = height
-                self.rect.y += height - shift_height
-            self.did = False
-
-        if not(up or down) and self.right_stop:
+        if self.right_stop:
             self.image.fill(Color(color))
             self.boltAnimStayRight.blit(self.image, (0, 0))
-        elif down and self.right_stop:
-            self.image.fill(Color(color))
-            self.boltAnimShiftRight.blit(self.image, (0, 0))
-        if not(up or down) and self.left_stop:
+        elif self.left_stop:
             self.image.fill(Color(color))
             self.boltAnimStayLeft.blit(self.image, (0, 0))
-        elif down and self.left_stop:
-            self.image.fill(Color(color))
-            self.boltAnimShiftLeft.blit(self.image, (0, 0))
-        elif down and not(self.left_stop or self.right_stop) and self.xvel == 0:
-            self.image.fill(Color(color))
-            self.boltAnimShiftRight.blit(self.image, (0, 0))
-        elif not (down or up) and not(self.left_stop or self.right_stop) and self.xvel == 0:
+        elif not(self.left_stop or self.right_stop) and self.xvel == 0:
             self.image.fill(Color(color))
             self.boltAnimStay.blit(self.image, (0, 0))
 
         self.onGround = False
         self.stuck = False
+        self.must_down = False
 
         self.rect.x += self.xvel
         self.collide(self.xvel, 0, platforms)
