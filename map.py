@@ -1,8 +1,8 @@
 from levels import levels
 import random
 
-platform_width = 32
-platform_height = 32
+platform_width = 50
+platform_height = 50
 platform_color = '#FF6262'
 
 total_level_width = len(levels[0][0]) * platform_width
@@ -18,7 +18,8 @@ def new_world_map(level__):
             if char == '-':
                 world_map_new.append([i * platform_width, j * platform_height, 'platform'])
             elif char == '*':
-                world_map_new.append([i * platform_width, j * platform_height, 'blockdie'])
+                world_map_new.append([i * platform_width, j * platform_height, 'blockdie',
+                                      j * platform_height + platform_height/2])
             elif char == '1':
                 world_map_new.append([i * platform_width + 10, j * platform_height, 'blockwin'])
             elif char == "#":

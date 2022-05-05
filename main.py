@@ -25,7 +25,9 @@ def main():
     total_level_width = len(levels[0][0]) * platform_width
     total_level_height = len(levels[0]) * platform_height
     # Определяем игрока
-    hero = Player(55, 55, 0)
+    playerX =55
+    playerY =55
+    hero = Player(playerY, playerX, 0)
     # Инициализация пайгейм
     down = left = right = up = False
     run = True
@@ -38,7 +40,7 @@ def main():
     # Камера
     camera = c.Camera(total_level_width, total_level_height, win_width, win_height)
     # Задний фон
-    prop = 1.4
+    prop = 1.8
     bg = pygame.image.load('bg/hCUwLQ.png')
     bg = pygame.transform.scale(bg, (int(bg.get_width()*prop), int(bg.get_height()*prop)))
     # Счётчики
@@ -72,8 +74,9 @@ def main():
                 platforms.append(bw)
             elif i[2] == 'blockdie':
                 bd = BlockDie(i[0], i[1])
-                platforms.append(bd)
                 entities.add(bd)
+                bd = BlockDie(i[0], i[3])
+                platforms.append(bd)
             elif i[2] == 'steelblock':
                 sb = Steelblock(i[0], i[1])
                 entities.add(sb)
@@ -115,10 +118,6 @@ def main():
                 up = True
             elif i.type == pygame.KEYUP and i.key == pygame.K_SPACE:
                 up = False
-            if i.type == pygame.KEYDOWN and i.key == pygame.K_s:
-                down = True
-            elif i.type == pygame.KEYUP and i.key == pygame.K_s:
-                down = False
         # Создаём группу сущностей и список объектов и создаём в ней героя
 
         if hero.winner:
@@ -147,11 +146,11 @@ def main():
         if frames % 3 == 0:
             animated_entities_on_maps[count_win].update()
         # Параллакс
-        screen.blit(bg, ((camera.state.x - bg.get_width()/2)/2, 0))
+        screen.blit(bg, ((camera.state.x)/2, (camera.state.y)/2))
         # прорисовка всех объектов
         for entity in entities_on_maps[count_win]:
             screen.blit(entity.image, camera.apply(entity))
-            if type(entity) == Coin and distance_is(30, entity, hero):
+            if type(entity) == Coin and distance_is(20, entity, hero):
                 coins += 1
                 entity.kill()
         # Счётчик монет
@@ -159,7 +158,7 @@ def main():
         # прорисовка главного героя
         camera.update(hero)
         # обновление показаний главного героя
-        hero.update(left, right, up, down, platforms_on_maps[count_win], FPS)
+        hero.update(left, right, up, platforms_on_maps[count_win], FPS)
         # обновление экрана
         pygame.display.update()
     pygame.quit()
