@@ -6,6 +6,7 @@ from blocks import Platform, BlockDie, BlockWin, Steelblock, PlatformLeft, Platf
 import Camera as c
 import time
 from monster import Coin
+from coin_counter import coin_counter
 
 
  # Высота
@@ -150,10 +151,11 @@ def main():
         # прорисовка всех объектов
         for entity in entities_on_maps[count_win]:
             screen.blit(entity.image, camera.apply(entity))
-            if type(entity) == Coin and distance_is(25, entity, hero):
+            if type(entity) == Coin and distance_is(30, entity, hero):
                 coins += 1
                 entity.kill()
-
+        # Счётчик монет
+        coin_counter(coins, screen)
         # прорисовка главного героя
         camera.update(hero)
         # обновление показаний главного героя

@@ -77,6 +77,7 @@ class Player(sprite.Sprite):
         self.right_stop = 0
         self.left_stop = 0
         self.coin = False
+        self.must_down = False
 
         # Анимация движения вправо
         boltanim = []
@@ -118,7 +119,21 @@ class Player(sprite.Sprite):
         self.boltAnimShiftRight = pyganim.PygAnimation(animation_shift_right)
         self.boltAnimShiftRight.play()
 
+    def up_distance_is(self, distance_min, obj):
+        obj_x = obj.rect.x
+        obj_y = obj.rect.y - obj.rect.height / 2
+        self_x = self.rect.x
+        self_y = self.rect.y - self.rect.height / 2
+        distance_up = self_y - obj_y
+        obj_x = set(i for i in range(obj_x+obj.rect.width))
+        self_x = set(i for i in range(self_x+self.rect.width))
+        if distance_up <= distance_min and obj_x.intersection(self_x):
+            return True
+        else:
+            return False
+
     def update(self, left, right, up, down, platforms, FPS):
+        down = down or self.must_down
         if not self.onGround or self.stuck:
             self.yvel += Gravity
 
@@ -229,6 +244,7 @@ class Player(sprite.Sprite):
 
         self.onGround = False
         self.stuck = False
+        self.must_down = False
 
         self.rect.x += self.xvel
         self.collide(self.xvel, 0, platforms)
@@ -257,6 +273,8 @@ class Player(sprite.Sprite):
                     self.die()
                 elif isinstance(platform, blocks.BlockWin):
                     self.win()
+            if self.up_distance_is(60, platform):
+                self.must_down = True
 
     def die(self):
         time.sleep(0.5)
