@@ -2,11 +2,11 @@ import pygame
 from levels import levels
 from map import maps, platform_width, platform_height
 from player import Player, distance_is
-from blocks import Platform, BlockDie, BlockWin, Steelblock, PlatformLeft, PlatformRight, PlatformMiddle, BlockWater
+from blocks import Platform, Water
 import Camera as c
 import time
 from monster import Coin
-from coin_counter import coin_counter
+from counter import coin_counter, fps_counter
 
 
  # Высота
@@ -20,16 +20,12 @@ background_color = '#004400'
 def main():
     # Частота кадров которую мы хотим
     # need_fps = int(input("Введите частоту кадров: "))
+    Size_map = levels[0].map_size
     need_fps = 60
-    # Ширина высота первого уровня
-    total_level_width = len(levels[0][0]) * platform_width
-    total_level_height = len(levels[0]) * platform_height
     # Определяем игрока
-    playerX =55
-    playerY =55
-    hero = Player(playerY, playerX, 0)
+    total_level_height, total_level_width = Size_map.height*platform_height, Size_map.width*platform_width
     # Инициализация пайгейм
-    down = left = right = up = False
+    left = right = up = False
     run = True
     pygame.init()
     # Экран
@@ -49,60 +45,47 @@ def main():
     new_time = time.time()
     FPS = 180
     tick = 60
+    player_coordinates = []
     entities_on_maps = []
     platforms_on_maps = []
     animated_entities_on_maps = []
     coins = 0
     # Переключатель между картами + иницализация недвижимых объектов на карте
-    for k in range(len(maps)):
+    for map_ in maps:
         animated_entities = pygame.sprite.Group()
         entities = pygame.sprite.Group()
+        entities_list = []
         platforms = []
-        entities.add(hero)
-        for i in maps[k]:
-            if i[2] == 'platform':
-                pf = Platform(i[0], i[1])
-                entities.add(pf)
-                platforms.append(pf)
-            elif i[2] == "W":
-                bw = BlockWater(i[0], i[1])
-                entities.add(bw)
-                animated_entities.add(bw)
-            elif i[2] == 'blockwin':
-                bw = BlockWin(i[0], i[1])
-                entities.add(bw)
-                platforms.append(bw)
-            elif i[2] == 'blockdie':
-                bd = BlockDie(i[0], i[1])
-                entities.add(bd)
-                bd = BlockDie(i[0], i[3])
-                platforms.append(bd)
-            elif i[2] == 'steelblock':
-                sb = Steelblock(i[0], i[1])
-                entities.add(sb)
-                platforms.append(sb)
-            elif i[2] == 'platform_l':
-                pl = PlatformLeft(i[0], i[1])
-                entities.add(pl)
+        for i in map_:
+            if i[0] == 'p':
+                pl = Platform(i[1], i[2])
+                entities_list.append(pl)
                 platforms.append(pl)
-            elif i[2] == 'platform_r':
-                pr = PlatformRight(i[0], i[1])
-                entities.add(pr)
-                platforms.append(pr)
-            elif i[2] == 'platform_m':
-                pm = PlatformMiddle(i[0], i[1])
-                entities.add(pm)
-                platforms.append(pm)
-            elif i[2] == "C":
-                cn = Coin(i[0], i[1], 1)
-                entities.add(cn)
+            if i[0] == 'e':
+                en = Platform(i[1], i[2])
+                entities_list.append(en)
+            if i[0] == 'c':
+                cn = Coin(i[1], 1)
+                entities_list.append(cn)
                 animated_entities.add(cn)
+            if i[0] == 'w':
+                wt = Water(i[1], i[2])
+                entities_list.append(wt)
+                animated_entities.add(wt)
+            if i[0] == 'P':
+                player_coordinates.append([i[1], i[2]])
+        hero = Player(player_coordinates[count_win][0], player_coordinates[count_win][1], 0,
+                      total_level_width, total_level_height)
+        entities_list.append(hero)
+        entities_list.reverse()
+        for entity in entities_list:
+            entities.add(entity)
         entities_on_maps.append(entities)
         platforms_on_maps.append(platforms)
         animated_entities_on_maps.append(animated_entities)
     while run:
         timer = pygame.time.Clock()
-        timer.tick(64)
+        timer.tick(tick)
         for i in pygame.event.get():
             if i.type == pygame.QUIT:
                 run = False
@@ -122,12 +105,10 @@ def main():
 
         if hero.winner:
             count_win += 1
-            hero.winner = 0
-            total_level_width = len(levels[count_win][0]) * platform_width
-            total_level_height = len(levels[count_win]) * platform_height
-            camera = c.Camera(total_level_width, total_level_height,
-                              min(win_width, total_level_width),
-                              min(win_height, total_level_height))
+            Size_map = levels[count_win].map_size
+            total_level_height, total_level_width = Size_map.height*platform_height, Size_map.width*platform_width
+            hero = Player(player_coordinates[count_win][0], player_coordinates[count_win][1], 0,
+                          total_level_width, total_level_height)
 
         frames += 1
         real_time = time.time()
@@ -135,7 +116,6 @@ def main():
         if real_time - new_time > 1:
             new_time = time.time()
             FPS = frames
-            print(FPS)
             if FPS < need_fps:
                 tick += 1
             elif FPS > need_fps:
@@ -146,15 +126,16 @@ def main():
         if frames % 3 == 0:
             animated_entities_on_maps[count_win].update()
         # Параллакс
-        screen.blit(bg, ((camera.state.x)/2, (camera.state.y)/2))
+        screen.blit(bg, (camera.state.x/2, camera.state.y/2))
         # прорисовка всех объектов
         for entity in entities_on_maps[count_win]:
             screen.blit(entity.image, camera.apply(entity))
-            if type(entity) == Coin and distance_is(20, entity, hero):
+            if type(entity) == Coin and distance_is(30, entity, hero):
                 coins += 1
                 entity.kill()
         # Счётчик монет
         coin_counter(coins, screen)
+        fps_counter(FPS, screen)
         # прорисовка главного героя
         camera.update(hero)
         # обновление показаний главного героя

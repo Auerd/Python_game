@@ -1,24 +1,24 @@
+import random
+
 import pyganim
 import pygame
 import time
 import blocks
-from map import total_level_width, total_level_height
 import math
 
 # Всё всё всё можно изменять в эксперементальных целях
 Coefficient = 60
-Bigger = 1.3
+Bigger = 1.5
 Surface = pygame.Surface
 sprite = pygame.sprite
 Color = pygame.Color
 Rect = pygame.Rect
 timer = pygame.time.Clock()
-Jump_power = 5.5
+Jump_power = 6
 Gravity = 0.35
 move_speed = 5
 width = int(22 * Bigger)
 height = int(32 * Bigger)
-shift_height = int((32 * Bigger) / 1.35)
 color = '#666666'
 move_speed_shift = move_speed/4
 animation_delay = 50
@@ -44,10 +44,10 @@ animation_stay_left = [(pygame.transform.flip(animation_stay_right[0][0], True, 
 
 
 def distance_is(distance_min, obj_1, obj_2):
-    obj_1_x = obj_1.rect.x - obj_1.rect.width/2
-    obj_1_y = obj_1.rect.y - obj_1.rect.height/2
-    obj_2_x = obj_2.rect.x - obj_2.rect.width/2
-    obj_2_y = obj_2.rect.y - obj_2.rect.height/2
+    obj_1_x = obj_1.rect.x + obj_1.rect.width/2
+    obj_1_y = obj_1.rect.y + obj_1.rect.height/2
+    obj_2_x = obj_2.rect.x + obj_2.rect.width/2
+    obj_2_y = obj_2.rect.y + obj_2.rect.height/2
     distance = math.sqrt((obj_1_x-obj_2_x)*(obj_1_x-obj_2_x) + (obj_1_y-obj_2_y)*(obj_1_y-obj_2_y))
     if distance <= distance_min:
         return True
@@ -57,7 +57,7 @@ def distance_is(distance_min, obj_1, obj_2):
 
 # Сам игрок
 class Player(sprite.Sprite):
-    def __init__(self, x, y, winner):
+    def __init__(self, x, y, winner, level_width, level_height):
         sprite.Sprite.__init__(self)
         self.xvel = 0
         self.startX = x
@@ -73,8 +73,8 @@ class Player(sprite.Sprite):
         self.did = False
         self.right_stop = 0
         self.left_stop = 0
-        self.coin = False
-        self.must_down = False
+        self.level_width = level_width
+        self.level_height = level_height
 
         # Анимация движения вправо
         boltanim = []
@@ -172,9 +172,9 @@ class Player(sprite.Sprite):
                     self.right_stop = True
 
         if -self.rect.height * 1.1 >= self.rect.y or \
-                self.rect.y >= total_level_height or \
-                self.rect.x <= self.rect.width or \
-                self.rect.x >= total_level_width:
+                self.rect.y >= self.level_height or \
+                self.rect.x <= -self.rect.width or \
+                self.rect.x >= self.level_width:
             self.die()
 
         if self.right_stop:
@@ -189,7 +189,6 @@ class Player(sprite.Sprite):
 
         self.onGround = False
         self.stuck = False
-        self.must_down = False
 
         self.rect.x += self.xvel
         self.collide(self.xvel, 0, platforms)
@@ -214,16 +213,20 @@ class Player(sprite.Sprite):
                     self.rect.top = platform.rect.bottom
                     self.yvel = 0
                     self.stuck = True
-                if isinstance(platform, blocks.BlockDie):
-                    self.die()
-                elif isinstance(platform, blocks.BlockWin):
-                    self.win()
+                # if isinstance(platform, blocks.BlockDie):
+                #     self.hurt_from_block()
+                # elif isinstance(platform, blocks.Platform):
+                #     self.win()
 
     def die(self):
         time.sleep(0.5)
         self.teleporting(self.startX, self.startY)
         self.xvel = 0
         self.yvel = 0
+
+    def hurt_from_block(self):
+        self.yvel = -Jump_power
+        self.xvel = random.randint(-move_speed*2, move_speed*2)
 
     def win(self):
         time.sleep(0.5)
