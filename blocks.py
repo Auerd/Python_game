@@ -18,54 +18,26 @@ ANIMATION_WATER = [pygame.transform.scale(pygame.image.load(f"tiles/Tiles/tile_0
 
 
 class Platform(Sprite):
-    def __init__(self, x, y):
+    def __init__(self, rect, image):
         Sprite.__init__(self)
-        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0002.png"),
-                                            (platform_width, platform_height))
-        self.rect = Rect(x, y, platform_width, platform_height)
+        self.image = image
+        self.rect = rect
 
 
-class PlatformLeft(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0001.png"),
-                                            (platform_width, platform_height))
+class Water(Sprite):
+    def __init__(self, rect, animation):
+        Sprite.__init__(self)
+        boltanim = []
+        self.image = Surface((platform_width, platform_height))
+        for anim in animation:
+            boltanim.append((anim, animation_delay))
+        self.boltAnimWater = pyganim.PygAnimation(boltanim)
+        self.boltAnimWater.play()
+        self.rect = rect
 
-
-class PlatformRight(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0003.png"),
-                                            (platform_width, platform_height))
-
-
-class PlatformMiddle(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0000.png"),
-                                            (platform_width, platform_height))
-
-
-class BlockDie(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        self.image = pygame.image.load("tiles/Tiles/tile_0068.png")
-        self.image = pygame.transform.scale(self.image, (platform_width, platform_height))
-        self.rect = Rect(x, y, platform_width, platform_height/2)
-
-
-class Steelblock(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        self.image = pygame.transform.scale(pygame.image.load("tiles/Tiles/tile_0029.png"),
-                                            (platform_width, platform_height))
-
-
-class BlockWin(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        self.image = pygame.image.load("blocks/Win.png")
-        self.image.set_colorkey('#000000')
+    def update(self):
+        self.image.fill(Color('#35424C'))
+        self.boltAnimWater.blit(self.image, (0, 0))
 
 
 class BlockWater(Platform):
