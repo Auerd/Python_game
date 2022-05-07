@@ -133,7 +133,7 @@ class Player(sprite.Sprite):
             return False
 
     def update(self, left, right, up, down, platforms, FPS):
-        down = down or self.must_down
+        # down = down or self.must_down
         if not self.onGround or self.stuck:
             self.yvel += Gravity
 
@@ -244,7 +244,7 @@ class Player(sprite.Sprite):
 
         self.onGround = False
         self.stuck = False
-        self.must_down = False
+        # self.must_down = False
 
         self.rect.x += self.xvel
         self.collide(self.xvel, 0, platforms)
@@ -273,8 +273,8 @@ class Player(sprite.Sprite):
                     self.die()
                 elif isinstance(platform, blocks.BlockWin):
                     self.win()
-            if self.up_distance_is(60, platform):
-                self.must_down = True
+            # if self.up_distance_is(60, platform):
+            #     self.must_down = True
 
     def die(self):
         time.sleep(0.5)
