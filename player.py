@@ -4,6 +4,7 @@ import pyganim
 import pygame
 import time
 import blocks
+import monster
 import math
 
 # Всё всё всё можно изменять в эксперементальных целях
@@ -43,16 +44,13 @@ animation_stay_right = [(pygame.transform.scale(pygame.image.load('player2/p1_st
 animation_stay_left = [(pygame.transform.flip(animation_stay_right[0][0], True, False), 0.1)]
 
 
-def distance_is(distance_min, obj_1, obj_2):
+def distance(obj_1, obj_2):
     obj_1_x = obj_1.rect.x + obj_1.rect.width/2
     obj_1_y = obj_1.rect.y + obj_1.rect.height/2
     obj_2_x = obj_2.rect.x + obj_2.rect.width/2
     obj_2_y = obj_2.rect.y + obj_2.rect.height/2
-    distance = math.sqrt((obj_1_x-obj_2_x)*(obj_1_x-obj_2_x) + (obj_1_y-obj_2_y)*(obj_1_y-obj_2_y))
-    if distance <= distance_min:
-        return True
-    else:
-        return False
+    distance_now = math.sqrt((obj_1_x - obj_2_x) * (obj_1_x - obj_2_x) + (obj_1_y - obj_2_y) * (obj_1_y - obj_2_y))
+    return distance_now
 
 
 # Сам игрок
@@ -215,8 +213,10 @@ class Player(sprite.Sprite):
                     self.stuck = True
                 # if isinstance(platform, blocks.BlockDie):
                 #     self.hurt_from_block()
-                # elif isinstance(platform, blocks.Platform):
-                #     self.win()
+                elif isinstance(platform, monster.MovingObject):
+                    if platform.move_speed_y < 0:
+                        self.yvel = -1
+
 
     def die(self):
         time.sleep(0.5)

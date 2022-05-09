@@ -24,6 +24,16 @@ class Platform(Sprite):
         self.rect = rect
 
 
+class BlockDie(Platform):
+    def __init__(self, rect, image):
+        Platform.__init__(self, rect, image)
+
+
+class BlockWin(Platform):
+    def __init__(self, rect, image):
+        Platform.__init__(self, rect, image)
+
+
 class Water(Sprite):
     def __init__(self, rect, animation):
         Sprite.__init__(self)
