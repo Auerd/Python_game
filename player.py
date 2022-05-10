@@ -216,7 +216,10 @@ class Player(sprite.Sprite):
                 elif isinstance(platform, monster.MovingObject):
                     if platform.move_speed_y < 0:
                         self.yvel = -1
-
+                    if platform.move_speed_x > 0:
+                        self.xvel += 0.3
+                    elif platform.move_speed_x < 0:
+                        self.xvel -= 0.3
 
     def die(self):
         time.sleep(0.5)

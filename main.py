@@ -33,7 +33,7 @@ def main():
     # Звуки
     woods_sound = mixer.Sound("sound/0074.mp3")
     waterfall_sound = mixer.Sound("sound/0052.mp3")
-    volume_percent = 75
+    volume_percent = 30
     woods_volume = volume_percent / 100
     # Экран
     screen = pygame.display.set_mode(display)
@@ -78,14 +78,10 @@ def main():
                 entities_list.append(wt)
                 animated_entities.add(wt)
             elif i[0] == 'wf':
-                wt = Water(i[1], i[2])
-                entities_list.append(wt)
-                animated_entities.add(wt)
-                waterfalls.append(wt)
-            elif i[0] == 'c':
-                cn = Coin(i[1], 1)
-                entities_list.append(cn)
-                animated_entities.add(cn)
+                wf = Water(i[1], i[2])
+                entities_list.append(wf)
+                animated_entities.add(wf)
+                waterfalls.append(wf)
             elif i[0] == 'm':
                 mv = MovingObject(i[1], i[2], i[3], i[4])
                 entities_list.append(mv)
@@ -99,9 +95,14 @@ def main():
                 en = Platform(i[1], i[2])
                 entities_list.append(en)
         for i in map_:
+            if i[0] == 'c':
+                cn = Coin(i[1], 1)
+                entities_list.append(cn)
+                animated_entities.add(cn)
+        for i in map_:
             if i[0] == 'P':
-                player_coordinates.append([i[1], i[2]])
-                hero = Player(player_coordinates[map_counter][0], player_coordinates[map_counter][1], 0,
+                player_coordinates = [i[1], i[2]]
+                hero = Player(player_coordinates[0], player_coordinates[1], 0,
                                              total_level_width, total_level_height)
                 entities_list.append(hero)
                 players_maps.append(hero)
@@ -122,6 +123,7 @@ def main():
         for entity in entities_list:
             entities.add(entity)
         waterfalls_on_maps.append(waterfalls)
+        print(waterfalls_on_maps)
         entities_on_maps.append(entities)
         platforms_on_maps.append(platforms)
         animated_entities_on_maps.append(animated_entities)
@@ -150,8 +152,7 @@ def main():
             count_win += 1
             Size_map = levels[count_win].map_size
             total_level_height, total_level_width = Size_map.height * platform_height, Size_map.width * platform_width
-            players_maps[count_win] = Player(player_coordinates[count_win][0], player_coordinates[count_win][1], 0,
-                                             total_level_width, total_level_height)
+            camera = c.Camera(total_level_width, total_level_height, win_width, win_height)
 
         frames += 1
         real_time = time.time()
@@ -181,7 +182,7 @@ def main():
                 players_maps[count_win].winner = True
         # Звук
         waterfall_volume = set_waterfall_volume(
-            waterfalls_on_maps[0][0], players_maps[count_win], 500
+            waterfalls_on_maps[count_win][0], players_maps[count_win], 550
         ) / 100 * volume_percent
         waterfall_sound.set_volume(waterfall_volume)
         # Счётчик монет
