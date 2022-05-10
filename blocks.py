@@ -24,6 +24,16 @@ class Platform(Sprite):
         self.rect = rect
 
 
+class BlockDie(Platform):
+    def __init__(self, rect, image):
+        Platform.__init__(self, rect, image)
+
+
+class BlockWin(Platform):
+    def __init__(self, rect, image):
+        Platform.__init__(self, rect, image)
+
+
 class Water(Sprite):
     def __init__(self, rect, animation):
         Sprite.__init__(self)
@@ -34,9 +44,10 @@ class Water(Sprite):
         self.boltAnimWater = pyganim.PygAnimation(boltanim)
         self.boltAnimWater.play()
         self.rect = rect
+        self.image.set_colorkey('#000000')
 
     def update(self):
-        self.image.fill(Color('#35424C'))
+        self.image.fill(Color('#000000'))
         self.boltAnimWater.blit(self.image, (0, 0))
 
 

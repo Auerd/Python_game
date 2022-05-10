@@ -21,6 +21,7 @@ def coin_counter(coins, screen):
     for i in range(len(coins)):
         screen.blit(png_to_coin.get(coins[i]), (platform_width*i/2, int(platform_height*1.5)))
 
+
 def fps_counter(fps, screen):
     fps = list(str(fps))
     fps.reverse()
