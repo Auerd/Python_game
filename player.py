@@ -44,10 +44,10 @@ animation_stay_left = [(pygame.transform.flip(animation_stay_right[0][0], True, 
 
 
 def distance_is(distance_min, obj_1, obj_2):
-    obj_1_x = obj_1.rect.x - obj_1.rect.width/2
-    obj_1_y = obj_1.rect.y - obj_1.rect.height/2
-    obj_2_x = obj_2.rect.x - obj_2.rect.width/2
-    obj_2_y = obj_2.rect.y - obj_2.rect.height/2
+    obj_1_x = obj_1.rect.x + obj_1.rect.width/2
+    obj_1_y = obj_1.rect.y + obj_1.rect.height/2
+    obj_2_x = obj_2.rect.x + obj_2.rect.width/2
+    obj_2_y = obj_2.rect.y + obj_2.rect.height/2
     distance = math.sqrt((obj_1_x-obj_2_x)*(obj_1_x-obj_2_x) + (obj_1_y-obj_2_y)*(obj_1_y-obj_2_y))
     if distance <= distance_min:
         return True
