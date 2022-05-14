@@ -3,11 +3,11 @@ from pygame import mixer
 from levels import levels
 from map import maps, platform_width, platform_height
 from player import Player, distance
-from blocks import Platform, Water, BlockWin, BlockDie
+from blocks import Platform, Water, BlockWin, BlockDie, Ladder
 import Camera as c
 import time
 from monster import Coin, MovingObject
-from counter import coin_counter, fps_counter
+from counter import coin_counter, fps_counter, lifes_counter
 from sounds import set_waterfall_volume
 
 # Высота
@@ -28,13 +28,19 @@ def main():
     left = right = up = False
     run = True
     pygame.init()
+    # Шрифт
+    game_over_font = pygame.font.Font("fonts/ARCADECLASSIC.TTF", 50)
+    game_over_text = game_over_font.render("GAME OVER", True, (100, 100, 100))
+    text_height = game_over_text.get_height()
+    text_width = game_over_text.get_width()
+    text_x = (win_width - text_width) / 2
+    text_y = (win_height - text_height) / 2
     # Инициализация mixer
     mixer.init(channels=1)
     # Звуки
     woods_sound = mixer.Sound("sound/0074.mp3")
     waterfall_sound = mixer.Sound("sound/0052.mp3")
     volume_percent = 30
-    woods_volume = volume_percent / 100
     # Экран
     screen = pygame.display.set_mode(display)
     pygame.display.set_caption('хз пока что за игра')
@@ -54,7 +60,6 @@ def main():
     tick = 60
     coins = 0
     # Списки объектов
-    player_coordinates = []
     entities_on_maps = []
     platforms_on_maps = []
     animated_entities_on_maps = []
@@ -62,7 +67,6 @@ def main():
     waterfalls_on_maps = []
     woods_sound.play(loops=-1)
     waterfall_sound.play(loops=-1)
-    woods_sound.set_volume(woods_volume)
     map_counter = 0
     # Переключатель между картами + иницализация недвижимых объектов на карте
     for map_ in maps:
@@ -71,7 +75,6 @@ def main():
         entities_list = []
         platforms = []
         waterfalls = []
-
         for i in map_:
             if i[0] == 'w':
                 wt = Water(i[1], i[2])
@@ -103,7 +106,7 @@ def main():
             if i[0] == 'P':
                 player_coordinates = [i[1], i[2]]
                 hero = Player(player_coordinates[0], player_coordinates[1], 0,
-                                             total_level_width, total_level_height)
+                              total_level_width, total_level_height)
                 entities_list.append(hero)
                 players_maps.append(hero)
         for i in map_:
@@ -111,10 +114,18 @@ def main():
                 pl = Platform(i[1], i[2])
                 entities_list.append(pl)
                 platforms.append(pl)
+            elif i[0] == 'bd':
+                bd = BlockDie(i[1], i[2]+platform_height/2)
+                platforms.append(bd)
+                bd = BlockDie(i[1], i[2])
+                entities_list.append(bd)
         for i in map_:
             if i[0] == 'e_u':
                 en = Platform(i[1], i[2])
                 entities_list.append(en)
+            if i[0] == 'ld':
+                ld = Ladder(i[1], i[2])
+                entities_list.append(ld)
         for i in map_:
             if i[0] == 'e_u2':
                 en = Platform(i[1], i[2])
@@ -123,7 +134,6 @@ def main():
         for entity in entities_list:
             entities.add(entity)
         waterfalls_on_maps.append(waterfalls)
-        print(waterfalls_on_maps)
         entities_on_maps.append(entities)
         platforms_on_maps.append(platforms)
         animated_entities_on_maps.append(animated_entities)
@@ -160,7 +170,6 @@ def main():
         if real_time - new_time > 1:
             new_time = time.time()
             FPS = frames
-            print("Ресурс компьютера: " + str(tick))
             if FPS < need_fps:
                 tick += 1
             elif FPS > need_fps:
@@ -184,14 +193,23 @@ def main():
         waterfall_volume = set_waterfall_volume(
             waterfalls_on_maps[count_win][0], players_maps[count_win], 550
         ) / 100 * volume_percent
+        woods_volume = volume_percent / 100
         waterfall_sound.set_volume(waterfall_volume)
-        # Счётчик монет
+        woods_sound.set_volume(woods_volume)
+        if players_maps[count_win].lifes < 1:
+            screen.fill((0, 0, 0))
+            screen.blit(game_over_text, (text_x, text_y))
+            volume_percent -= 0.1
+            if volume_percent < -10:
+                run = False
+        # Счётчики
         coin_counter(coins, screen)
         fps_counter(FPS, screen)
+        lifes_counter(players_maps[count_win].lifes, screen)
         # обновление положения камеры
         camera.update(players_maps[count_win])
         # обновление показаний главного героя
-        players_maps[count_win].update(left, right, up, platforms_on_maps[count_win], FPS)
+        players_maps[count_win].update(left, right, up, platforms_on_maps[count_win], FPS, entities_on_maps[count_win])
         # обновление экрана
         pygame.display.update()
     pygame.quit()

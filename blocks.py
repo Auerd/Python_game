@@ -24,7 +24,15 @@ class Platform(Sprite):
         self.rect = rect
 
 
-class BlockDie(Platform):
+class BlockDie(Sprite):
+    def __init__(self, x, y):
+        Sprite.__init__(self)
+        self.rect = pygame.Rect(x, y, platform_width, platform_height/2)
+        self.image = pygame.image.load('tiles/Tiles/tile_0068.png')
+        self.image = pygame.transform.scale(self.image, (platform_width, platform_height))
+
+
+class Ladder(Platform):
     def __init__(self, rect, image):
         Platform.__init__(self, rect, image)
 

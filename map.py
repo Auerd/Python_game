@@ -54,6 +54,28 @@ def new_world_map(level):
                         world_map_new.append(
                             ["p", rect(platform_height * x, platform_width * y, platform_width, platform_height), image]
                         )
+
+        elif layer.name == 'Ladders':
+            for y, row in enumerate(layer.data):
+                for x, char in enumerate(row):
+                    if char != 0:
+                        char -= 1
+                        str_char = str(char)
+                        str_char = to_four(str_char)
+                        image = pygame.image.load(f'tiles/Tiles/tile_{str_char}.png')
+                        image = pygame.transform.scale(image, (platform_height, platform_width))
+                        world_map_new.append(
+                            ["ld", rect(platform_height * x, platform_width * y, platform_width, platform_height), image]
+                        )
+
+        elif layer.name == 'Die_Blocks':
+            for y, row in enumerate(layer.data):
+                for x, char in enumerate(row):
+                    if char == 69:
+                        world_map_new.append(
+                            ["bd", platform_height * x, platform_width * y]
+                        )
+
         elif layer.name == 'Block_win':
             for y, row in enumerate(layer.data):
                 for x, char in enumerate(row):
