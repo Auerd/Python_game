@@ -11,8 +11,8 @@ from counter import coin_counter, fps_counter, lifes_counter
 from sounds import set_waterfall_volume
 
 # Высота
-win_width = 1000
-win_height = 640
+win_width = 192 * 8
+win_height = 108 * 8
 display = (win_width, win_height)  # Дисплей
 
 background_color = '#004400'
@@ -57,7 +57,7 @@ def main():
     frames = 0
     new_time = time.time()
     FPS = 180
-    tick = 60
+    tick = 80
     coins = 0
     # Списки объектов
     entities_on_maps = []
