@@ -237,7 +237,7 @@ class Player(sprite.Sprite):
                     self.rect.top = platform.rect.bottom
                     self.yvel = 0
                     self.stuck = True
-                if isinstance(platform, blocks.BlockDie):
+                if isinstance(platform, blocks.BlockDie) and not self.stuck:
                     self.hurt_from_block()
                     self.timer_hurt = True
                     self.lifes -= 1
