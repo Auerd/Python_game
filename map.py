@@ -125,21 +125,12 @@ def new_world_map(level):
                     if char != 0:
                         char -= 1
                         if char == 74:
-                            animation = [
-                                pygame.transform.scale(
+                            animation = [pygame.transform.scale(
                                     pygame.image.load(f"tiles/Tiles/tile_{(to_four(i))}.png"),
                                     (platform_width, platform_height))
                                 for i in range(char, char + 2)
                             ]
                             block = 'wf'
-                        elif char != 33 and char != 53:
-                            animation = [
-                                pygame.transform.scale(
-                                    pygame.image.load(f"tiles/Tiles/tile_{(to_four(i))}.png"),
-                                    (platform_width, platform_height))
-                                for i in range(char, char+2)
-                            ]
-                            block = 'w'
                         elif char == 33 or char == 53:
                             animation = [
                                 pygame.transform.scale(
@@ -148,6 +139,15 @@ def new_world_map(level):
                                 for i in [33, 53]
                             ]
                             block = 'w'
+                        else:
+                            animation = [
+                                pygame.transform.scale(
+                                    pygame.image.load(f"tiles/Tiles/tile_{(to_four(i))}.png"),
+                                    (platform_width, platform_height))
+                                for i in range(char, char+2)
+                            ]
+                            block = 'w'
+
 
                         world_map_new.append(
                             [block, rect(platform_height * x, platform_width * y, platform_width, platform_height),
@@ -160,6 +160,7 @@ def new_world_map(level):
                 world_map_new.append(
                     ['P', playerX, playerY]
                 )
+                print(player)
         elif layer.name == "Moving":
             for obj in layer.tiled_objects:
                 id_block = obj.gid - 1
@@ -175,6 +176,20 @@ def new_world_map(level):
                 world_map_new.append(
                     ['m', rect(x, y, width, height), image, (tox, toy), 200]
                 )
+        elif layer.name == 'AlphaEntities':
+            for y, row in enumerate(layer.data):
+                for x, char in enumerate(row):
+                    if char != 0:
+                        char -= 1
+                        str_char = str(char)
+                        str_char = to_four(str_char)
+                        image = pygame.image.load(f'tiles/Tiles/tile_{str_char}.png')
+                        image = pygame.transform.scale(image, (platform_height, platform_width))
+                        world_map_new.append(
+                            ["ae",
+                             rect(platform_height * x, platform_width * y, platform_width, platform_height),
+                             image]
+                        )
 
     return world_map_new
 

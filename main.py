@@ -3,7 +3,7 @@ from pygame import mixer
 from levels import levels
 from map import maps, platform_width, platform_height
 from player import Player, distance
-from blocks import Platform, Water, BlockWin, BlockDie, Ladder
+from blocks import Platform, Water, BlockWin, BlockDie, Ladder, AlphaEntity
 import Camera as c
 import time
 from monster import Coin, MovingObject
@@ -68,19 +68,25 @@ def main():
     woods_sound.play(loops=-1)
     waterfall_sound.play(loops=-1)
     map_counter = 0
-    # Переключатель между картами + иницализация недвижимых объектов на карте
+    # Переключатель между картами + иницализация объектов на карте
     for map_ in maps:
         animated_entities = pygame.sprite.Group()
         entities = pygame.sprite.Group()
         entities_list = []
         platforms = []
         waterfalls = []
+        Size_map = levels[map_counter].map_size
+        total_level_height, total_level_width = Size_map.height * platform_height, Size_map.width * platform_width
         for i in map_:
             if i[0] == 'w':
+                for num_pic in range(len(i[2])):
+                    i[2][num_pic] = i[2][num_pic].convert_alpha()
                 wt = Water(i[1], i[2])
                 entities_list.append(wt)
                 animated_entities.add(wt)
             elif i[0] == 'wf':
+                for num_pic in range(len(i[2])):
+                    i[2][num_pic] = i[2][num_pic].convert_alpha()
                 wf = Water(i[1], i[2])
                 entities_list.append(wf)
                 animated_entities.add(wf)
@@ -93,6 +99,10 @@ def main():
             elif i[0] == 'bw':
                 pl = BlockWin(i[1], i[2])
                 entities_list.append(pl)
+            elif i[0] == 'ae':
+                ae = AlphaEntity(i[1], i[2])
+                entities_list.append(ae)
+                animated_entities.add(ae)
         for i in map_:
             if i[0] == 'e':
                 en = Platform(i[1], i[2])
@@ -138,6 +148,7 @@ def main():
         platforms_on_maps.append(platforms)
         animated_entities_on_maps.append(animated_entities)
         map_counter += 1
+    # сам цикл
     while run:
         timer = pygame.time.Clock()
         timer.tick(tick)
@@ -190,11 +201,14 @@ def main():
             elif type(entity) == BlockWin and 30 > distance(entity, players_maps[count_win]):
                 players_maps[count_win].winner = True
         # Звук
-        waterfall_volume = set_waterfall_volume(
-            waterfalls_on_maps[count_win][0], players_maps[count_win], 550
-        ) / 100 * volume_percent
+        if len(waterfalls_on_maps[count_win]) > 0:
+            waterfall_volume = set_waterfall_volume(
+                waterfalls_on_maps[count_win][0], players_maps[count_win], 550
+            ) / 100 * volume_percent
+            waterfall_sound.set_volume(waterfall_volume)
+        else:
+            waterfall_sound.set_volume(0)
         woods_volume = volume_percent / 100
-        waterfall_sound.set_volume(waterfall_volume)
         woods_sound.set_volume(woods_volume)
         if players_maps[count_win].lifes < 1:
             screen.fill((0, 0, 0))

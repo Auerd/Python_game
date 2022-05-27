@@ -42,6 +42,14 @@ class BlockWin(Platform):
         Platform.__init__(self, rect, image)
 
 
+class AlphaEntity(Platform):
+    def __init__(self, rect, image):
+        Platform.__init__(self, rect, image)
+
+    def update(self):
+        self.image.set_alpha(200)
+
+
 class Water(Sprite):
     def __init__(self, rect, animation):
         Sprite.__init__(self)
@@ -56,20 +64,5 @@ class Water(Sprite):
 
     def update(self):
         self.image.fill(Color('#000000'))
-        self.boltAnimWater.blit(self.image, (0, 0))
-
-
-class BlockWater(Platform):
-    def __init__(self, x, y):
-        Platform.__init__(self, x, y)
-        boltanim = []
-        self.image = Surface((platform_width, platform_height))
-        for anim in ANIMATION_WATER:
-            boltanim.append((anim, animation_delay))
-        self.boltAnimWater = pyganim.PygAnimation(boltanim)
-        self.boltAnimWater.play()
-        self.image.set_colorkey('#000000')
-
-    def update(self):
-        self.image.fill(Color('#000000'))
+        self.image.set_alpha(200)
         self.boltAnimWater.blit(self.image, (0, 0))

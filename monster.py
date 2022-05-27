@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import time
 import pyganim
 import pygame
 from map import platform_width, platform_height
